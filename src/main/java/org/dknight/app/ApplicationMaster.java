@@ -19,6 +19,9 @@
 package org.dknight.app;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -40,6 +43,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.net.NetUtils;
@@ -207,8 +211,9 @@ public class ApplicationMaster {
 
 	//yarnClent has the interface of yarn cluster.
 	private YarnClient yarnClient;
+    private String confXMLPath;
 
-  /**
+    /**
    * @param args Command line args
    */
   public static void main(String[] args) {
@@ -269,10 +274,13 @@ public class ApplicationMaster {
     }
   }
 
-  public ApplicationMaster() {
+  public ApplicationMaster()  {
     // Set up the configuration
-    System.setProperty("hadoop.home.dir", "D:\\Programs\\hadoop-2.2.0");
     conf = new YarnConfiguration();
+      Path clusterConfPath = new Path("cluster-conf.xml");
+      conf.addResource(clusterConfPath);
+      LOG.info("Load the cluster configuration file from" + clusterConfPath.getName());
+
   }
 
   /**
@@ -387,6 +395,7 @@ public class ApplicationMaster {
 
       getLocalResourceFromEnv(envs);
 
+      getConfFileFrom(envs);
 
       containerMemory = Integer.parseInt(cliParser.getOptionValue(
         "container_memory", "10"));
@@ -401,6 +410,23 @@ public class ApplicationMaster {
 
     return true;
   }
+
+    private void getConfFileFrom(Map<String, String> envs) {
+        if (envs.containsKey(DSConstants.CLUSTER_CONF_XML_PATH)) {
+            confXMLPath = envs.get(DSConstants.CLUSTER_CONF_XML_PATH);
+            try {
+                URL yarnConfUrl = ConverterUtils.getYarnUrlFromURI(new URI(
+                        confXMLPath));
+                LOG.info("Load upload cluster-conf xml file from " + yarnConfUrl + "at hdfs. With confXMLPath:"
+                + confXMLPath);
+                Configuration yarnConf = new YarnConfiguration();
+                yarnConf.addResource(confXMLPath);
+            } catch (URISyntaxException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
+
+    }
 
     private void getLocalResourceFromEnv(Map<String, String> envs) {
         if (envs.containsKey(DSConstants.DISTRIBUTEDSHELLSCRIPTLOCATION)) {

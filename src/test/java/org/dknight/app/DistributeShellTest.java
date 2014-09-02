@@ -32,9 +32,11 @@ public class DistributeShellTest  {
     private MiniYARNCluster miniYARNCluster;
 
     private String classpathDir = "";
+    private Configuration miniYarnConf;
+
     @Before
     public void setUp() throws IOException {
-        System.setProperty("hadoop.home.dir", "D:\\Programs\\hadoop-2.2.0");
+        //System.setProperty("hadoop.home.dir", "D:\\Programs\\hadoop-2.2.0");
         classpathDir = this.getClass().getResource("/").getPath();
 //        Configuration configuration = new Configuration();
 //        Path tempDir = Files.createTempDirectory("yarn-learn");
@@ -54,20 +56,19 @@ public class DistributeShellTest  {
         miniYARNCluster.getConfig().writeXml(
                 new FileOutputStream(new File(classpathDir + "yarn-conf.xml"))
         );
+        miniYarnConf = miniYARNCluster.getConfig();
+        miniYarnConf.set("yarn.application.classpath", classpathDir);
     }
 
     @Test
     public void distributeShellNullTest() throws Exception {
-        Configuration conf = new Configuration();
-        conf.addResource(new org.apache.hadoop.fs.Path(
-                new File(classpathDir+"yarn-conf.xml").getAbsolutePath()));
         boolean result = false;
         String[] args = {"-jar",classpathDir + "yarn-learn-1.0-SNAPSHOT.jar","-shell_command", "dir",
                 "-num_containers", "1",
                 "-priority", "10",
 				"-debug"};
         try {
-            Client client = new Client(conf);
+            Client client = new Client(miniYarnConf);
             LOG.info("Initializing Client");
             try {
                 boolean doRun = client.init(args);
