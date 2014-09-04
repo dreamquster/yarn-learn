@@ -4,7 +4,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileUtil;
+import org.apache.hadoop.net.NetUtils;
 import org.apache.hadoop.security.Credentials;
+import org.apache.hadoop.security.SecurityUtil;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.yarn.api.ApplicationConstants;
@@ -39,7 +41,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -82,7 +86,8 @@ public class UnmanagedAppMaster {
         rmClient.init(yarnConf);
 
         amrmCallBackHanlder = new AMRMCallBackHanlder();
-        this.amrmClient = AMRMClientAsync.createAMRMClientAsync(300, amrmCallBackHanlder);
+        //this.amrmClient = AMRMClientAsync.createAMRMClientAsync(300, amrmCallBackHanlder);
+		this.amrmClient = AMRMClientAsync.createAMRMClientAsync(1000, amrmCallBackHanlder);
         this.amrmClient.init(yarnConf);
 
         containerListener = new NMCallBackHandler();
@@ -93,6 +98,8 @@ public class UnmanagedAppMaster {
         this.classpath = classpath;
         this.amCmd = amCmd;
         this.amCompleted = false;
+
+		launchThreads = new ArrayList<Thread>();
     }
 
     public void start() throws YarnException, IOException {
@@ -111,6 +118,10 @@ public class UnmanagedAppMaster {
         Token<AMRMTokenIdentifier> token =
                 rmClient.getAMRMToken(attemptId.getApplicationId());
 
+
+
+		InetSocketAddress local = new InetSocketAddress("localhost", 3191);
+		token.setService(SecurityUtil.buildTokenService(local));
         UserGroupInformation.getCurrentUser().addToken(token.getService(), token);
         UserGroupInformation loginUser = UserGroupInformation.getCurrentUser();
         UserGroupInformation.AuthenticationMethod authMethod = loginUser.getAuthenticationMethod();
@@ -153,7 +164,6 @@ public class UnmanagedAppMaster {
 
         Resource containResource = Records.newRecord(Resource.class);
         containResource.setMemory(256);
-        containResource.setVirtualCores(2);
         String racks[] = new String[]{"default-rack"};
         AMRMClient.ContainerRequest request = new AMRMClient.ContainerRequest(containResource, null,racks , Priority.newInstance(10), true);
         amrmClient.registerApplicationMaster("localHost", -1, null);
