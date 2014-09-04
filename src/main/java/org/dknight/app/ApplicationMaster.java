@@ -38,6 +38,7 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.classification.InterfaceAudience;
@@ -211,7 +212,6 @@ public class ApplicationMaster {
 
 	//yarnClent has the interface of yarn cluster.
 	private YarnClient yarnClient;
-    private String confXMLPath;
 
     /**
    * @param args Command line args
@@ -395,7 +395,7 @@ public class ApplicationMaster {
 
       getLocalResourceFromEnv(envs);
 
-      getConfFileFrom(envs);
+
 
       containerMemory = Integer.parseInt(cliParser.getOptionValue(
         "container_memory", "10"));
@@ -410,23 +410,6 @@ public class ApplicationMaster {
 
     return true;
   }
-
-    private void getConfFileFrom(Map<String, String> envs) {
-        if (envs.containsKey(DSConstants.CLUSTER_CONF_XML_PATH)) {
-            confXMLPath = envs.get(DSConstants.CLUSTER_CONF_XML_PATH);
-            try {
-                URL yarnConfUrl = ConverterUtils.getYarnUrlFromURI(new URI(
-                        confXMLPath));
-                LOG.info("Load upload cluster-conf xml file from " + yarnConfUrl + "at hdfs. With confXMLPath:"
-                + confXMLPath);
-                Configuration yarnConf = new YarnConfiguration();
-                yarnConf.addResource(confXMLPath);
-            } catch (URISyntaxException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-        }
-
-    }
 
     private void getLocalResourceFromEnv(Map<String, String> envs) {
         if (envs.containsKey(DSConstants.DISTRIBUTEDSHELLSCRIPTLOCATION)) {
@@ -495,9 +478,9 @@ public class ApplicationMaster {
     nmClientAsync.init(conf);
     nmClientAsync.start();
 
-//	  yarnClient = YarnClient.createYarnClient();
-//	  yarnClient.init(conf);
-//	  yarnClient.start();
+	  yarnClient = YarnClient.createYarnClient();
+	  yarnClient.init(conf);
+	  yarnClient.start();
     // Setup local RPC Server to accept status requests directly from clients
     // TODO need to setup a protocol for client to be able to communicate to
     // the RPC server
@@ -529,9 +512,34 @@ public class ApplicationMaster {
     // containers
     // Keep looping until all the containers are launched and shell script
     // executed on them ( regardless of success/failure).
+      List<NodeReport> nodeReports = null;
+      if (yarnClient != null) {
+          try {
+              nodeReports = yarnClient.getNodeReports(NodeState.RUNNING);
+              for (NodeReport node : nodeReports) {
+                  LOG.info("Got node report from ASM for"
+                          + ", nodeId=" + node.getNodeId()
+                          + ", nodeAddress" + node.getHttpAddress()
+                          + ", nodeRackName" + node.getRackName()
+                          + ", nodeNumContainers" + node.getNumContainers());
+              }
+          } catch (YarnException e) {
+              e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+          } catch (IOException e) {
+              e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+          }
+      }
     for (int i = 0; i < numTotalContainers; ++i) {
-
-      ContainerRequest containerAsk = setupContainerAskForRM();
+        ContainerRequest containerAsk = null;
+      if (CollectionUtils.isNotEmpty(nodeReports)) {
+          NodeReport requestNode = nodeReports.get(Math.min(i, nodeReports.size() - 1));
+          String[] requsetHosts = new String[] {requestNode.getNodeId().getHost()};
+          LOG.info("Ask container at the host list:" + requsetHosts);
+          containerAsk = setupContainerAskForRM(requsetHosts);
+      } else {
+          LOG.info("Ask container with ANY host");
+          containerAsk = setupContainerAskForRM(null);
+      }
       amRMClient.addContainerRequest(containerAsk);
     }
     numRequestedContainers.set(numTotalContainers);
@@ -566,7 +574,7 @@ public class ApplicationMaster {
     }
 
 	  //stop yarnClient
-	  //yarnClient.stop();
+	  yarnClient.stop();
     // When the application completes, it should stop all running containers
     LOG.info("Application completed. Stopping running containers");
     nmClientAsync.stop();
@@ -648,7 +656,7 @@ public class ApplicationMaster {
 
       if (askCount > 0) {
         for (int i = 0; i < askCount; ++i) {
-          ContainerRequest containerAsk = setupContainerAskForRM();
+          ContainerRequest containerAsk = setupContainerAskForRM(null);
           amRMClient.addContainerRequest(containerAsk);
         }
       }
@@ -888,7 +896,7 @@ public class ApplicationMaster {
    *
    * @return the setup ResourceRequest to be sent to RM
    */
-  private ContainerRequest setupContainerAskForRM() {
+  private ContainerRequest setupContainerAskForRM(String hosts[]) {
     // setup requirements for hosts
     // using * as any host will do for the distributed shell app
     // set the priority for the request
@@ -901,7 +909,7 @@ public class ApplicationMaster {
     Resource capability = Records.newRecord(Resource.class);
     capability.setMemory(containerMemory);
 
-    String[] hosts = {"DKNIGHT-PC"};
+
 	  ContainerRequest request = new ContainerRequest(capability, hosts, null,
         pri);
     LOG.info("Requested container ask: " + request.toString());

@@ -41,7 +41,7 @@
 <property><name>ipc.client.connect.max.retries.on.timeouts</name><value>45</value><source>core-default.xml</source></property>
 <property><name>mapreduce.job.complete.cancel.delegation.tokens</name><value>true</value><source>mapred-default.xml</source></property>
 <property><name>fs.trash.interval</name><value>0</value><source>core-default.xml</source></property>
-<property><name>yarn.resourcemanager.admin.address</name><value>10.2.23.27:4933</value><source>programatically</source></property>
+<property><name>yarn.resourcemanager.admin.address</name><value>10.2.23.27:6164</value><source>programatically</source></property>
 <property><name>ha.health-monitor.check-interval.ms</name><value>1000</value><source>core-default.xml</source></property>
 <property><name>hadoop.jetty.logs.serve.aliases</name><value>true</value><source>core-default.xml</source></property>
 <property><name>hadoop.http.authentication.kerberos.principal</name><value>HTTP/_HOST@LOCALHOST</value><source>core-default.xml</source></property>
@@ -206,10 +206,10 @@
 <property><name>yarn.resourcemanager.connect.max-wait.ms</name><value>900000</value><source>yarn-default.xml</source></property>
 <property><name>fs.automatic.close</name><value>true</value><source>core-default.xml</source></property>
 <property><name>mapreduce.tasktracker.healthchecker.script.timeout</name><value>600000</value><source>mapred-default.xml</source></property>
-<property><name>yarn.resourcemanager.address</name><value>10.2.23.27:4926</value><source>programatically</source></property>
+<property><name>yarn.resourcemanager.address</name><value>10.2.23.27:6157</value><source>programatically</source></property>
 <property><name>yarn.nodemanager.health-checker.interval-ms</name><value>600000</value><source>yarn-default.xml</source></property>
 <property><name>yarn.resourcemanager.container-tokens.master-key-rolling-interval-secs</name><value>86400</value><source>yarn-default.xml</source></property>
-<property><name>yarn.log.dir</name><value>/D:/EveryDayDoc/2014-9-1/yarn-learn/target/classes/</value><source>programatically</source></property>
+<property><name>yarn.log.dir</name><value>/D:/EveryDayDoc/2014-9-1/yarn-learn-git/target/classes/</value><source>programatically</source></property>
 <property><name>mapreduce.reduce.markreset.buffer.percent</name><value>0.0</value><source>mapred-default.xml</source></property>
 <property><name>hadoop.security.group.mapping.ldap.directory.search.timeout</name><value>10000</value><source>core-default.xml</source></property>
 <property><name>mapreduce.map.log.level</name><value>INFO</value><source>mapred-default.xml</source></property>
@@ -267,7 +267,7 @@
 <property><name>file.client-write-packet-size</name><value>65536</value><source>core-default.xml</source></property>
 <property><name>mapreduce.reduce.cpu.vcores</name><value>1</value><source>mapred-default.xml</source></property>
 <property><name>yarn.nodemanager.delete.thread-count</name><value>4</value><source>yarn-default.xml</source></property>
-<property><name>yarn.resourcemanager.scheduler.address</name><value>10.2.23.27:4919</value><source>programatically</source></property>
+<property><name>yarn.resourcemanager.scheduler.address</name><value>10.2.23.27:6150</value><source>programatically</source></property>
 <property><name>fs.trash.checkpoint.interval</name><value>0</value><source>core-default.xml</source></property>
 <property><name>hadoop.http.authentication.signature.secret.file</name><value>${user.home}/hadoop-http-auth-signature-secret</value><source>core-default.xml</source></property>
 <property><name>s3native.stream-buffer-size</name><value>4096</value><source>core-default.xml</source></property>
@@ -305,12 +305,12 @@
 <property><name>mapreduce.map.skip.maxrecords</name><value>0</value><source>mapred-default.xml</source></property>
 <property><name>yarn.scheduler.minimum-allocation-vcores</name><value>1</value><source>yarn-default.xml</source></property>
 <property><name>file.replication</name><value>1</value><source>core-default.xml</source></property>
-<property><name>yarn.resourcemanager.resource-tracker.address</name><value>10.2.23.27:4912</value><source>programatically</source></property>
+<property><name>yarn.resourcemanager.resource-tracker.address</name><value>10.2.23.27:6143</value><source>programatically</source></property>
 <property><name>mapreduce.jobtracker.restart.recover</name><value>false</value><source>mapred-default.xml</source></property>
 <property><name>hadoop.work.around.non.threadsafe.getpwuid</name><value>false</value><source>core-default.xml</source></property>
 <property><name>mapreduce.tasktracker.indexcache.mb</name><value>10</value><source>mapred-default.xml</source></property>
 <property><name>mapreduce.output.fileoutputformat.compress</name><value>false</value><source>mapred-default.xml</source></property>
-<property><name>hadoop.tmp.dir</name><value>/D:/EveryDayDoc/2014-9-1/yarn-learn/target/classes/</value><source>programatically</source></property>
+<property><name>hadoop.tmp.dir</name><value>/D:/EveryDayDoc/2014-9-1/yarn-learn-git/target/classes/</value><source>programatically</source></property>
 <property><name>yarn.nodemanager.resource.cpu-vcores</name><value>8</value><source>yarn-default.xml</source></property>
 <property><name>hadoop.kerberos.kinit.command</name><value>kinit</value><source>core-default.xml</source></property>
 <property><name>mapreduce.job.committer.setup.cleanup.needed</name><value>true</value><source>mapred-default.xml</source></property>
@@ -321,7 +321,7 @@
 <property><name>yarn.dispatcher.exit-on-error</name><value>true</value><source>programatically</source></property>
 <property><name>net.topology.script.number.args</name><value>100</value><source>core-default.xml</source></property>
 <property><name>mapreduce.task.profile.maps</name><value>0-2</value><source>mapred-default.xml</source></property>
-<property><name>yarn.resourcemanager.webapp.address</name><value>0151-01086:4908</value><source>programatically</source></property>
+<property><name>yarn.resourcemanager.webapp.address</name><value>0151-01086:6140</value><source>programatically</source></property>
 <property><name>mapreduce.jobtracker.system.dir</name><value>${hadoop.tmp.dir}/mapred/system</value><source>mapred-default.xml</source></property>
 <property><name>hadoop.ssl.hostname.verifier</name><value>DEFAULT</value><source>core-default.xml</source></property>
 <property><name>yarn.nodemanager.vmem-pmem-ratio</name><value>2.1</value><source>yarn-default.xml</source></property>

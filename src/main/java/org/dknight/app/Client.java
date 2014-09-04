@@ -531,6 +531,9 @@ public class Client {
     vargs.add(Environment.JAVA_HOME.$() + "/bin/java");
     // Set Xmx based on am memory size
     vargs.add("-Xmx" + amMemory + "m");
+//      if (debugFlag) {
+//          vargs.add("-Xdebug -Xrunjdwp:transport=dt_socket,address=9998,server=y,suspend=y");
+//      }
     // Set class name 
     vargs.add(appMasterMainClass);
     // Set params for Application Master
