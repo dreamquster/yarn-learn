@@ -3,6 +3,7 @@ package org.dknight.app.kafka.request;
 import io.netty.buffer.ByteBuf;
 import org.dknight.app.kafka.KafkaConst;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -16,7 +17,11 @@ public class MessageSet {
 
     private int messageSize; // 4byte
 
-    private List<KMessage> messages;
+    private List<KMessage> messages = new LinkedList<KMessage>();
+
+    public void addMessage(KMessage kMessage) {
+        messages.add(kMessage);
+    }
 
     public int sizeInBytes() {
         return OFFSET_SIZE_LEN + getMessageSize();

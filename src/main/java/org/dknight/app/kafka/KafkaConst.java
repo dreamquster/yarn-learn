@@ -19,7 +19,9 @@ public final class KafkaConst {
 
     public static final String CHARSET_UTF8 = "UTF-8";
 
-    public static final int BYTEARRAY_LEN = 4;
+    public static final int INT_BYTES = 4;
+
+    public static final int SERVER_ACK = 1;
 
 
     private KafkaConst() {}
